@@ -13,7 +13,7 @@ A web application that recognizes hand gestures from video files in real-time us
 2. Press `F5` to start the local server and launch the app.
 
 ## Main Files
-- `Frontend.html` - The main web page and interface.
+- `Index.html` - The main web page and interface.
 - `start.bat` / `start-server.ps1` - Scripts to run the local server.
 - `test-gestures.mp4` - A sample video used to test the gesture recognition.
 
