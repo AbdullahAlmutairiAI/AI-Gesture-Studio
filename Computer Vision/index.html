@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AI Gesture Studio</title>
+
+    <!-- CSS Styles -->
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background: #f4f4f9;
+        }
+
+        #videoElement {
+            width: 640px;
+            height: 480px;
+            background: #000;
+            border-radius: 8px;
+        }
+
+        #reactionOutput {
+            font-size: 100px;
+            margin-top: 20px;
+            min-height: 120px;
+        }
+
+        #status {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+    </style>
+
+    <!-- Import MediaPipe as an ES Module -->
+    <script type="module">
+        import {
+            GestureRecognizer,
+            FilesetResolver
+        } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/vision_bundle.mjs";
+
+        const video = document.getElementById('videoElement');
+        const status = document.getElementById('status');
+        const reactionOutput = document.getElementById('reactionOutput');
+
+        // A simple dictionary mapping MediaPipe labels to emojis
+        const reactions = {
+            "Thumb_Up": "👍",
+            "Victory": "✌️",
+            "Open_Palm": "🖐️",
+            "Closed_Fist": "✊"
+        };
+
+        let gestureRecognizer;
+
+        async function initializeApp() {
+            try {
+                status.innerText = "Loading AI Model...";
+
+                const vision = await FilesetResolver.forVisionTasks(
+                    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+                );
+
+                gestureRecognizer = await GestureRecognizer.createFromOptions(vision, {
+                    baseOptions: {
+                        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
+                        delegate: "CPU"
+                    },
+                    runningMode: "VIDEO"
+                });
+
+                status.innerText = "Model Loaded! Starting video...";
+
+                // Start the detection loop once the video is playing
+                video.addEventListener('play', () => {
+                    processVideoLoop();
+                });
+
+                // If the video is already playing, start loop immediately
+                if (!video.paused && !video.ended) {
+                    processVideoLoop();
+                } else {
+                    await video.play();
+                }
+            } catch (err) {
+                status.innerText = "Error during initialization: " + err.message;
+                console.error("Initialization error:", err);
+            }
+        }
+
+        let lastVideoTime = -1;
+        function processVideoLoop() {
+            if (video.paused || video.ended) return;
+
+            // Only run inference if the video frame has advanced
+            if (video.currentTime !== lastVideoTime && gestureRecognizer) {
+                // Pass the video element directly to MediaPipe with monotonically increasing timestamp
+                const results = gestureRecognizer.recognizeForVideo(video, performance.now());
+
+                if (results.gestures && results.gestures.length > 0) {
+                    const gestureName = results.gestures[0][0].categoryName;
+                    const confidence = results.gestures[0][0].score;
+
+                    // Apply a simple confidence threshold
+                    if (confidence > 0.60) {
+                        reactionOutput.innerText = reactions[gestureName] || "🤷";
+                        status.innerText = "Detected: " + gestureName;
+                    }
+                } else {
+                    reactionOutput.innerText = "⏳";
+                    status.innerText = "Searching for hand...";
+                }
+                lastVideoTime = video.currentTime;
+            }
+
+            requestAnimationFrame(processVideoLoop);
+        }
+
+        initializeApp();
+    </script>
+</head>
+
+<body>
+
+    <!-- Notice the src is pointing to an MP4 file, not a webcam stream -->
+    <video id="videoElement" src="test-gestures.mp4" loop muted playsinline></video>
+
+    <div id="status">Initializing...</div>
+    <div id="reactionOutput">⏳</div>
+
+</body>
+
+</html>
