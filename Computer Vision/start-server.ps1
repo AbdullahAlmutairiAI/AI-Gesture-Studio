@@ -1,6 +1,6 @@
-$port = 8080
+$port = PORT_HERE
 $root = $PSScriptRoot
-$url = "http://127.0.0.1:$port/index.html"
+$url = "PASTE_LOCAL_IP_HERE:$port/index.html"
 
 $mimeTypes = @{
     ".html" = "text/html; charset=utf-8"
