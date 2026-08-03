@@ -22,7 +22,7 @@ $mimeTypes = @{
 }
 
 $listener = New-Object System.Net.HttpListener
-$listener.Prefixes.Add("http://127.0.0.1:$port/")
+$listener.Prefixes.Add("PASTE_LOCAL_IP_HERE:$port/")
 $listener.Start()
 
 Write-Host ""
