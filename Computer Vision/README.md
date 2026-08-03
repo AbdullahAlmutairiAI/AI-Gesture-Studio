@@ -1,6 +1,6 @@
 # AI Gesture Studio
 
-A web application that recognizes hand gestures from video files in real-time using machine learning.
+A web application that recognizes hand gestures from video files in real-time using deep learning.
 
 ## How to Run
 
