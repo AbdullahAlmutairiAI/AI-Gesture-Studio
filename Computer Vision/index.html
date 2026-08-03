@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <title>AI Gesture Studio</title>
 
-    <!-- CSS Styles -->
     <style>
         body {
             font-family: sans-serif;
@@ -34,7 +33,7 @@
         }
     </style>
 
-    <!-- Import MediaPipe as an ES Module -->
+    <!-- Import MediaPipe -->
     <script type="module">
         import {
             GestureRecognizer,
@@ -96,7 +95,7 @@
 
             // Only run inference if the video frame has advanced
             if (video.currentTime !== lastVideoTime && gestureRecognizer) {
-                // Pass the video element directly to MediaPipe with monotonically increasing timestamp
+                // Pass the video element directly to MediaPipe
                 const results = gestureRecognizer.recognizeForVideo(video, performance.now());
 
                 if (results.gestures && results.gestures.length > 0) {
@@ -124,7 +123,7 @@
 
 <body>
 
-    <!-- Notice the src is pointing to an MP4 file, not a webcam stream -->
+    <!-- MP4 file -->
     <video id="videoElement" src="test-gestures.mp4" loop muted playsinline></video>
 
     <div id="status">Initializing...</div>
